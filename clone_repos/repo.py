@@ -29,6 +29,7 @@ class Repo:
         base: Path,
         git_url: str,
         *,
+        symlink_to: Optional[str] = None,
         dirname: Optional[str] = None,
         postinstall_cmd: Optional[str] = None,
         pip_install: bool = False,
@@ -41,6 +42,15 @@ class Repo:
         self.editable_install = editable_install
         self.editable_check_dirs = ["src"]
         self.dirname = dirname
+        self.symlink_to = symlink_to
+
+    @staticmethod
+    def strip_str(val: Optional[str]) -> Optional[str]:
+        if val is None:
+            return None
+        if val.strip() == "":
+            return None
+        return val
 
     @classmethod
     def from_dict(
@@ -48,9 +58,7 @@ class Repo:
     ) -> "Repo":
         if data is None:
             data = {}
-        dirname = data.get("dirname")
-        if dirname is not None and dirname.strip() == "":
-            dirname = None
+        dirname = cls.strip_str(data.get("dirname"))
         pip_data = data.get("pip")
         pip_install = False
         editable_install = False
@@ -58,9 +66,8 @@ class Repo:
             pip_install = True
         elif pip_data == "editable":
             editable_install = True
-        postinstall = data.get("postinstall")
-        if postinstall is not None and postinstall.strip() == "":
-            postinstall = None
+        postinstall = cls.strip_str(data.get("postinstall"))
+        symlink_to = cls.strip_str(data.get("symlink_to"))
         if "base" in data and isinstance(data["base"], str):
             base = Path(data["base"]).expanduser().absolute()
             assert base.exists(), f"provided base '{base}' does not exist"
@@ -69,6 +76,7 @@ class Repo:
             git_url=git_url,
             dirname=dirname,
             postinstall_cmd=postinstall,
+            symlink_to=symlink_to,
             pip_install=pip_install,
             editable_install=editable_install,
         )
@@ -107,6 +115,19 @@ class Repo:
                 err=True,
             )
             return FileNotFoundError()
+
+    def _symlink(self) -> None:
+        assert self.symlink_to is not None
+        st = Path(self.symlink_to).expanduser().absolute()
+        if not st.exists():
+            click.echo(f"{self.name}: target directory {st} does not exist")
+            return
+        link_target = st / self.name
+        if os.path.islink(link_target):
+            click.echo(f"{self.name}: link target {link_target} is already linked")
+            return
+        click.echo(f"Symlinking {self.target} -> {link_target}")
+        os.symlink(self.target, link_target)
 
     def _pip_install(self) -> None:
         proc = subprocess.Popen(
@@ -156,6 +177,8 @@ class Repo:
         err = self._git_clone()
         if err is not None:
             return
+        if self.symlink_to is not None:
+            self._symlink()
         if self.pip_install:
             self._pip_install()
         if self.editable_install:
