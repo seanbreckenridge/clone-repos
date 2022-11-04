@@ -25,6 +25,15 @@ Options:
   --help                 Show this message and exit.
 ```
 
+The format for a repo is:
+
+```yaml
+"url to repository":
+  dirname: directory_name # directory name to clone into
+  pip: how # 'install' or 'editable'
+  postinstall: "shell command here"
+```
+
 This expects a `$REPOS` environment variable to be set, which is the base directory to clone into, e.g. in your shell config set:
 
 ```bash
