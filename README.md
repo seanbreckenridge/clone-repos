@@ -46,7 +46,7 @@ To run, just run `clone-repos`
 
 I setup an alias in my dotfiles like:
 
-`alias cr='python3 -m pip install 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos'`
+`alias cr="python3 -m pip install 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos"`
 
 ### Tests
 
