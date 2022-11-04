@@ -61,6 +61,9 @@ class Repo:
         postinstall = data.get("postinstall")
         if postinstall is not None and postinstall.strip() == "":
             postinstall = None
+        if "base" in data and isinstance(data["base"], str):
+            base = Path(data["base"]).expanduser().absolute()
+            assert base.exists(), f"provided base '{base}' does not exist"
         return cls(
             base=base,
             git_url=git_url,

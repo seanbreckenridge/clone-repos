@@ -29,6 +29,7 @@ The format for a repo is:
 
 ```yaml
 "url to repository":
+  base: path # overwrite base-path for this repo
   dirname: directory_name # directory name to clone into
   pip: how # 'install' or 'editable'
   postinstall: "shell command here"
