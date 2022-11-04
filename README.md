@@ -1,20 +1,10 @@
 # clone-repos
 
-a basic git repo clone script
+a basic git repo clone script, with special support for pip and/or editable installs, using [reorder_editable](https://github.com/seanbreckenridge/reorder_editable)
 
-supports running some sort of postinstall step as well
+This supports running some sort of postinstall step (a shell command) as well
 
 As an example of a `clone-repos.yaml` file this expects, [see mine](https://sean.fish/d/clone-repos.yaml?redirect)
-
-This has special support for editable pip installs, using [reorder_editable](https://github.com/seanbreckenridge/reorder_editable)
-
-This expects a `$REPOS` environment variable to be set, which is the base directory to clone into, e.g. in your shell config set:
-
-```bash
-export REPOS="${HOME}/Repos"
-```
-
-or you can provide the `--base-path` flag when running
 
 ## Installation
 
@@ -34,6 +24,20 @@ Options:
                          [required]
   --help                 Show this message and exit.
 ```
+
+This expects a `$REPOS` environment variable to be set, which is the base directory to clone into, e.g. in your shell config set:
+
+```bash
+export REPOS="${HOME}/Repos"
+```
+
+... or you can provide the `--base-path` flag when running
+
+To run, just run `clone-repos`
+
+I setup an alias in my dotfiles like:
+
+`alias cr='python3 -m pip install 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos'`
 
 ### Tests
 
