@@ -50,9 +50,9 @@ export REPOS="${HOME}/Repos"
 
 ... or you can provide the `--base-repos` flag when running
 
-To run, just run `clone-repos`
+To clone, run `clone-repos` or `python3 -m clone_repos`
 
-I setup an alias in my dotfiles like:
+To run this quickly on new machines, I setup an alias in my dotfiles like:
 
 `alias cr="python3 -m pip install 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos"`
 
