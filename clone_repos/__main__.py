@@ -25,6 +25,11 @@ default_config = conf_dir / "clone-repos.yaml"
     default=default_config,
 )
 def main(base_repos: Path, config_file: Path):
+    """
+    Clones and sets up your repos.
+
+    Can provide a CONFIG_FILE instead of using the default
+    """
     repos = parse_file(base=base_repos, file=config_file)
     for r in repos:
         r.run()

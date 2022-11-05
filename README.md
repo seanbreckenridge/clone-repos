@@ -4,7 +4,7 @@ a basic git repo clone script, with special support for pip and/or editable inst
 
 This supports running some sort of postinstall step (a shell command) as well
 
-For examples of a `clone-repos.yaml` file this expects, see [here](https://sean.fish/d/clone-repos.yaml?redirect) and [here](https://sean.fish/d/computer-clone-repos.yaml?redirect)
+For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see [here](https://sean.fish/d/clone-repos.yaml?redirect) and [here](https://sean.fish/d/computer-clone-repos.yaml?redirect)
 
 ## Installation
 
@@ -19,13 +19,17 @@ To install with pip, run:
 ```
 Usage: clone-repos [OPTIONS] CONFIG_FILE
 
+  Clones and sets up your repos.
+
+  Can provide a CONFIG_FILE instead of using the default
+
 Options:
   --base-repos DIRECTORY  base repository directory to clone repos into
                           [required]
   --help                  Show this message and exit.
 ```
 
-The format for a repo is:
+The full format for a repo is:
 
 ```yaml
 "url to repository":
