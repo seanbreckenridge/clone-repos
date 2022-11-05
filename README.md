@@ -20,9 +20,9 @@ To install with pip, run:
 Usage: clone-repos [OPTIONS] CONFIG_FILE
 
 Options:
-  --base-path DIRECTORY  base repository directory to clone repos into
-                         [required]
-  --help                 Show this message and exit.
+  --base-repos DIRECTORY  base repository directory to clone repos into
+                          [required]
+  --help                  Show this message and exit.
 ```
 
 The format for a repo is:
@@ -44,7 +44,7 @@ This expects a `$REPOS` environment variable to be set, which is the base direct
 export REPOS="${HOME}/Repos"
 ```
 
-... or you can provide the `--base-path` flag when running
+... or you can provide the `--base-repos` flag when running
 
 To run, just run `clone-repos`
 

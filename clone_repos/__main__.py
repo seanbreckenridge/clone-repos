@@ -12,7 +12,7 @@ default_config = conf_dir / "clone-repos.yaml"
 
 @click.command()
 @click.option(
-    "--base-path",
+    "--base-repos",
     required=True,
     type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
     envvar="REPOS",
@@ -24,8 +24,8 @@ default_config = conf_dir / "clone-repos.yaml"
     type=click.Path(dir_okay=False, file_okay=True, exists=True, path_type=Path),
     default=default_config,
 )
-def main(base_path: Path, config_file: Path):
-    repos = parse_file(base=base_path, file=config_file)
+def main(base_repos: Path, config_file: Path):
+    repos = parse_file(base=base_repos, file=config_file)
     for r in repos:
         r.run()
 
