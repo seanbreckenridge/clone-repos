@@ -16,7 +16,7 @@ default_config = conf_dir / "clone-repos.yaml"
     required=True,
     type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
     envvar="REPOS",
-    help="base repository directory to clone data into",
+    help="base repository directory to clone repos into",
 )
 @click.argument(
     "CONFIG_FILE",

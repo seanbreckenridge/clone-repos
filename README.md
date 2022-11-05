@@ -20,7 +20,7 @@ To install with pip, run:
 Usage: clone-repos [OPTIONS] CONFIG_FILE
 
 Options:
-  --base-path DIRECTORY  base repository directory to clone data into
+  --base-path DIRECTORY  base repository directory to clone repos into
                          [required]
   --help                 Show this message and exit.
 ```
