@@ -34,12 +34,14 @@ class Repo:
         postinstall_cmd: Optional[str] = None,
         pip_install: bool = False,
         editable_install: bool = False,
+        editable_non_user: bool = False,
     ) -> None:
         self.base = base
         self.git_url = git_url
         self.postinstall_cmd = postinstall_cmd
         self.pip_install = pip_install
         self.editable_install = editable_install
+        self.editable_non_user = editable_non_user
         self.editable_check_dirs = ["src"]
         self.dirname = dirname
         self.symlink_to = symlink_to
@@ -62,10 +64,14 @@ class Repo:
         pip_data = data.get("pip")
         pip_install = False
         editable_install = False
+        editable_non_user = False
         if pip_data == "install":
             pip_install = True
         elif pip_data == "editable":
             editable_install = True
+        elif pip_data == "editable_system":
+            editable_install = True
+            editable_non_user = True
         postinstall = cls.strip_str(data.get("postinstall"))
         symlink_to = cls.strip_str(data.get("symlink_to"))
         if "base" in data and isinstance(data["base"], str):
@@ -79,6 +85,7 @@ class Repo:
             symlink_to=symlink_to,
             pip_install=pip_install,
             editable_install=editable_install,
+            editable_non_user=editable_non_user,
         )
 
     def __repr__(self):
@@ -149,12 +156,9 @@ class Repo:
         if any(t in installed for t in targets):
             click.echo(f"{self.name}: {self.target} already in editable install list")
         else:
-            proc = subprocess.Popen(
-                [
-                    sys.executable,
-                    *shlex.split(f"-m pip install --user --editable '{self.target}'"),
-                ]
-            )
+            cmd = f"{sys.executable} -m pip install {'--user' if not self.editable_non_user else ''} --editable '{self.target}'"
+            click.echo(f"{self.name}: Running '{cmd}'")
+            proc = subprocess.Popen(shlex.split(cmd))
             proc.wait()
             if proc.returncode != 0:
                 click.echo(

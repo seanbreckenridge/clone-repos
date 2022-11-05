@@ -32,9 +32,11 @@ The format for a repo is:
   base: path # overwrite base-path for this repo
   dirname: directory_name # directory name to clone into
   symlink_to: directory_name # the parent directory to symlink the cloned repo to
-  pip: how # 'install' or 'editable'
+  pip: how # 'install', 'editable' or 'editable_system'
   postinstall: "shell command here"
 ```
+
+For `pip`, `editable` by default uses the `--user` flag, if you know what you're doing and want to install in your system lib directory, use `editable_system` (Note that this only works in particular python installations. In a lot of cases, pip will still default to installing into your `--user` directory instead). See [reorder_editable](https://github.com/seanbreckenridge/reorder_editable) for context.
 
 This expects a `$REPOS` environment variable to be set, which is the base directory to clone into, e.g. in your shell config set:
 
