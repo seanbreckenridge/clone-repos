@@ -7,7 +7,7 @@ import contextlib
 from functools import cached_property, lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional, Union, List, Iterator
 
 import click
 import yaml
@@ -15,7 +15,7 @@ from reorder_editable.core import Editable
 
 
 @contextlib.contextmanager
-def in_cwd(to_dir: os.PathLike):
+def in_cwd(to_dir: Union[str, Path]) -> Iterator[None]:
     curdir = os.getcwd()
     try:
         os.chdir(to_dir)
@@ -32,14 +32,14 @@ class Repo:
         *,
         symlink_to: Optional[str] = None,
         dirname: Optional[str] = None,
-        postinstall_cmd: Optional[str] = None,
+        postinstall_cmd: Optional[List[str]] = None,
         pip_install: bool = False,
         editable_install: bool = False,
         editable_non_user: bool = False,
     ) -> None:
         self.base = base
         self.git_url = git_url
-        self.postinstall_cmd = postinstall_cmd
+        self.postinstall_cmd = postinstall_cmd if postinstall_cmd is not None else []
         self.pip_install = pip_install
         self.editable_install = editable_install
         self.editable_non_user = editable_non_user
@@ -54,6 +54,20 @@ class Repo:
         if val.strip() == "":
             return None
         return val
+
+    @classmethod
+    def strip_lst(cls, val: Union[Optional[str], List[str]]) -> List[str]:
+        if val is None:
+            return []
+        if isinstance(val, str):
+            v = cls.strip_str(val)
+            assert v is not None
+            return [v]
+        elif isinstance(val, list):
+            return val
+        raise RuntimeError(
+            f"While trying to parse list, string or null, found {type(val)} {val}"
+        )
 
     @classmethod
     def from_dict(
@@ -73,7 +87,7 @@ class Repo:
         elif pip_data == "editable_system":
             editable_install = True
             editable_non_user = True
-        postinstall = cls.strip_str(data.get("postinstall"))
+        postinstall = cls.strip_lst(data.get("postinstall"))
         symlink_to = cls.strip_str(data.get("symlink_to"))
         if "base" in data and isinstance(data["base"], str):
             base = Path(data["base"]).expanduser().absolute()
@@ -89,7 +103,7 @@ class Repo:
             editable_non_user=editable_non_user,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.__dict__)
 
     __str__ = __repr__
@@ -110,7 +124,7 @@ class Repo:
     def _git_path() -> Union[str, RuntimeError]:
         git_path = shutil.which("git")
         if git_path is None:
-            return RuntimeError(f"Could not find 'git' on your $PATH")
+            return RuntimeError("Could not find 'git' on your $PATH")
         return git_path
 
     def _git_clone(self) -> Optional[Exception]:
@@ -119,7 +133,7 @@ class Repo:
             return gp
         if self.target.exists():
             click.echo(f"{self.name}: target {self.target} already exists", err=True)
-            return
+            return None
         proc = subprocess.Popen(
             shlex.split(f"{gp} clone '{self.git_url}' '{self.target}'")
         )
@@ -134,6 +148,7 @@ class Repo:
                 err=True,
             )
             return FileNotFoundError()
+        return None
 
     def _symlink(self) -> None:
         assert self.symlink_to is not None
@@ -180,14 +195,16 @@ class Repo:
     def _postinstall(self) -> None:
         with in_cwd(self.target):
             assert self.postinstall_cmd is not None
-            click.echo(f"{self.name}: running postinstall '{self.postinstall_cmd}'")
-            proc = subprocess.Popen(shlex.split(self.postinstall_cmd))
-            proc.wait()
-            if proc.returncode != 0:
-                click.echo(
-                    f"{self.name}: postinstall error, return code {proc.returncode}",
-                    err=True,
-                )
+            for cmd in self.postinstall_cmd:
+                click.echo(f"{self.name}: running postinstall '{cmd}'")
+                proc = subprocess.Popen(shlex.split(cmd))
+                proc.wait()
+                if proc.returncode != 0:
+                    click.echo(
+                        f"{self.name}: postinstall error, return code {proc.returncode}",
+                        err=True,
+                    )
+                    return
 
     def run(self) -> None:
         err = self._git_clone()
@@ -199,7 +216,7 @@ class Repo:
             self._pip_install()
         if self.editable_install:
             self._editable_install()
-        if self.postinstall_cmd is not None:
+        if len(self.postinstall_cmd) > 0:
             self._postinstall()
 
 

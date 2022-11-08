@@ -26,6 +26,8 @@ Usage: clone-repos [OPTIONS] CONFIG_FILE
 Options:
   --base-repos DIRECTORY  base repository directory to clone repos into
                           [required]
+  --parse-config          test parsing the config file instead of running
+                          clone
   --help                  Show this message and exit.
 ```
 
