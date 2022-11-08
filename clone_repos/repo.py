@@ -7,7 +7,7 @@ import contextlib
 from functools import cached_property, lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Union
 
 import click
 import yaml
@@ -107,14 +107,16 @@ class Repo:
 
     @lru_cache(maxsize=1)
     @staticmethod
-    def _git_path() -> str:
+    def _git_path() -> Union[str, RuntimeError]:
         git_path = shutil.which("git")
         if git_path is None:
-            raise RuntimeError(f"Could not find 'git' on your $PATH")
+            return RuntimeError(f"Could not find 'git' on your $PATH")
         return git_path
 
-    def _git_clone(self) -> Optional[FileNotFoundError]:
+    def _git_clone(self) -> Optional[Exception]:
         gp = self.__class__._git_path()
+        if isinstance(gp, Exception):
+            return gp
         if self.target.exists():
             click.echo(f"{self.name}: target {self.target} already exists", err=True)
             return
