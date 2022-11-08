@@ -24,6 +24,14 @@ def in_cwd(to_dir: Union[str, Path]) -> Iterator[None]:
         os.chdir(curdir)
 
 
+@lru_cache(maxsize=1)
+def _git_path() -> Union[str, RuntimeError]:
+    git_path = shutil.which("git")
+    if git_path is None:
+        return RuntimeError("Could not find 'git' on your $PATH")
+    return git_path
+
+
 class Repo:
     def __init__(
         self,
@@ -119,16 +127,8 @@ class Repo:
     def target(self) -> Path:
         return self.base / self.name
 
-    @lru_cache(maxsize=1)
-    @staticmethod
-    def _git_path() -> Union[str, RuntimeError]:
-        git_path = shutil.which("git")
-        if git_path is None:
-            return RuntimeError("Could not find 'git' on your $PATH")
-        return git_path
-
     def _git_clone(self) -> Optional[Exception]:
-        gp = self.__class__._git_path()
+        gp = _git_path()
         if isinstance(gp, Exception):
             return gp
         if self.target.exists():

@@ -24,6 +24,7 @@ setup(
     entry_points={"console_scripts": ["clone-repos = clone_repos.__main__:main"]},
     extras_require={
         "testing": [
+            "pytest",
             "mypy",
             "flake8",
         ]
