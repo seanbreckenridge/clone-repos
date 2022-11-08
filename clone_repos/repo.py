@@ -2,8 +2,9 @@ import sys
 import os
 import shlex
 import subprocess
+import shutil
 import contextlib
-from functools import cached_property
+from functools import cached_property, lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 from typing import Dict, Any, Optional, List
@@ -104,12 +105,21 @@ class Repo:
     def target(self) -> Path:
         return self.base / self.name
 
+    @lru_cache(maxsize=1)
+    @staticmethod
+    def _git_path() -> str:
+        git_path = shutil.which("git")
+        if git_path is None:
+            raise RuntimeError(f"Could not find 'git' on your $PATH")
+        return git_path
+
     def _git_clone(self) -> Optional[FileNotFoundError]:
+        gp = self.__class__._git_path()
         if self.target.exists():
             click.echo(f"{self.name}: target {self.target} already exists", err=True)
             return
         proc = subprocess.Popen(
-            shlex.split(f"git clone '{self.git_url}' '{self.target}'")
+            shlex.split(f"{gp} clone '{self.git_url}' '{self.target}'")
         )
         proc.wait()
         if proc.returncode != 0:
