@@ -5,11 +5,11 @@
   pip: editable
 "https://github.com/seanbreckenridge/bleanser-fork":
   dirname: bl-fork
-  symlink_to: '/tmp'
+  symlink_to: "/tmp"
   pip: editable
-  postinstall: 
+  postinstall:
     - 'git remote add upstream "https://github.com/karlicoss/bleanser"'
-    - 'git pull upstream master'
+    - "git pull upstream master"
 "https://github.com/seanbreckenridge/bleanser":
   pip: install
 "https://github.com/seanbreckenridge/promnesia-fork":

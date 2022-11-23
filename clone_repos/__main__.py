@@ -24,7 +24,7 @@ def _default(val: Any) -> Any:
     required=True,
     type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
     envvar="REPOS",
-    help="base repository directory to clone repos into",
+    help="base repository directory to clone repos into ($REPOS envvar)",
 )
 @click.option(
     "--parse-config",
