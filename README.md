@@ -4,7 +4,11 @@ a basic git repo clone script, with special support for pip and/or editable inst
 
 This supports running some sort of postinstall step (a shell command) as well
 
-For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see [here](https://sean.fish/d/clone-repos.yaml?redirect) and [here](https://sean.fish/d/computer-clone-repos.yaml?redirect)
+For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see
+
+- [clone-repos.yaml](https://sean.fish/d/clone-repos.yaml?redirect)
+- [computer-clone-repos.yaml](https://sean.fish/d/computer-clone-repos.yaml?redirect)
+- [hpi-clone-repos.yaml](https://sean.fish/d/hpi-clone-repos.yaml?redirect)
 
 ## Installation
 
