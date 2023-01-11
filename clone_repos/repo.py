@@ -255,12 +255,11 @@ class Repo:
         if len(self.postinstall_cmd) > 0:
             self._postinstall()
 
-
-def parse_file(base: Path, file: Path) -> List[Repo]:
-    repos: List[Repo] = []
-    with file.open("r") as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-    for key, data in data.items():
-        r = Repo.from_dict(git_url=key, base=base, data=data)
-        repos.append(r)
-    return repos
+    @classmethod
+    def parse_file(cls, base: Path, file: Path) -> List["Repo"]:
+        repos: List[Repo] = []
+        with file.open("r") as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+        for key, data in data.items():
+            repos.append(Repo.from_dict(git_url=key, base=base, data=data))
+        return repos

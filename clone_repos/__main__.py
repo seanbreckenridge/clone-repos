@@ -5,7 +5,7 @@ from typing import Any
 
 import click
 
-from .repo import parse_file
+from .repo import Repo
 
 
 conf_dir = Path(os.environ.get("XDG_CONFIG_DIR", Path.home() / ".config"))
@@ -44,7 +44,7 @@ def main(base_repos: Path, parse_config: bool, config_file: Path) -> None:
 
     Can provide a CONFIG_FILE instead of using the default
     """
-    repos = parse_file(base=base_repos, file=config_file)
+    repos = Repo.parse_file(base=base_repos, file=config_file)
     if parse_config:
         for r in repos:
             print(json.dumps(r.__dict__, default=_default))

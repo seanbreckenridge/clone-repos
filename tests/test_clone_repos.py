@@ -1,6 +1,6 @@
 import os
-from pathlib import Path, PosixPath
-from clone_repos.repo import Repo, parse_file
+from pathlib import Path
+from clone_repos.repo import Repo
 
 os.environ["REPOS"] = str(Path.home() / "Repos")
 
@@ -12,7 +12,7 @@ base = Path(os.environ["REPOS"])
 
 
 def test_parse_config() -> None:
-    repos = parse_file(base=base, file=conf)
+    repos = Repo.parse_file(base=base, file=conf)
     assert isinstance(repos, list)
     pl = repos[3]
     assert isinstance(pl, Repo)
