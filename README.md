@@ -2,7 +2,7 @@
 
 a basic git repo clone script, with special support for pip and/or editable installs, using [reorder_editable](https://github.com/seanbreckenridge/reorder_editable)
 
-This supports running some sort of postinstall step (a shell command) as well
+This supports running a preinstall (after cloning) or postinstall step (a shell command) as well
 
 For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see
 
@@ -43,8 +43,13 @@ The full format for a repo is:
   dirname: directory_name # directory name to clone into
   symlink_to: directory_name # the parent directory to symlink the cloned repo to
   pip: how # 'install', 'editable' or 'editable_system'
+  preinstall:
+    - "shell command 1"
+    - "shell command 2"
   postinstall: "shell command here"
 ```
+
+The `preinstall` and `postinstall` scripts can either be one command (a string), or multiple (a list)
 
 For `pip`, `editable` by default uses the `--user` flag, if you know what you're doing and want to install in your system lib directory, use `editable_system` (Note that this only works in particular python installations. In a lot of cases, pip will still default to installing into your `--user` directory instead). See [reorder_editable](https://github.com/seanbreckenridge/reorder_editable) for context.
 

@@ -27,3 +27,7 @@ def test_parse_config() -> None:
     assert pl.editable_non_user == False
     assert pl.dirname == "bl-fork"
     assert pl.symlink_to == "/tmp"
+
+    assert repos[0].git_url == "https://github.com/seanbreckenridge/ttally"
+    assert repos[0].preinstall_cmd == ["git pull"]
+    assert repos[2].preinstall_cmd == ["git pull"]

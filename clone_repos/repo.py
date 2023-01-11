@@ -40,6 +40,7 @@ class Repo:
         *,
         symlink_to: Optional[str] = None,
         dirname: Optional[str] = None,
+        preinstall_cmd: Optional[List[str]] = None,
         postinstall_cmd: Optional[List[str]] = None,
         pip_install: bool = False,
         editable_install: bool = False,
@@ -47,6 +48,7 @@ class Repo:
     ) -> None:
         self.base = base
         self.git_url = git_url
+        self.preinstall_cmd = preinstall_cmd if preinstall_cmd is not None else []
         self.postinstall_cmd = postinstall_cmd if postinstall_cmd is not None else []
         self.pip_install = pip_install
         self.editable_install = editable_install
@@ -95,6 +97,7 @@ class Repo:
         elif pip_data == "editable_system":
             editable_install = True
             editable_non_user = True
+        preinstall = cls.strip_lst(data.get("preinstall"))
         postinstall = cls.strip_lst(data.get("postinstall"))
         symlink_to = cls.strip_str(data.get("symlink_to"))
         if "base" in data and isinstance(data["base"], str):
@@ -104,6 +107,7 @@ class Repo:
             base=base,
             git_url=git_url,
             dirname=dirname,
+            preinstall_cmd=preinstall,
             postinstall_cmd=postinstall,
             symlink_to=symlink_to,
             pip_install=pip_install,
@@ -192,6 +196,20 @@ class Repo:
                     f"{self.name}: pip error, return code {proc.returncode}", err=True
                 )
 
+    def _preinstall(self) -> None:
+        with in_cwd(self.target):
+            assert self.preinstall_cmd is not None
+            for cmd in self.preinstall_cmd:
+                click.echo(f"{self.name}: running preinstall '{cmd}'")
+                proc = subprocess.Popen(shlex.split(cmd))
+                proc.wait()
+                if proc.returncode != 0:
+                    click.echo(
+                        f"{self.name}: preinstall error, return code {proc.returncode}",
+                        err=True,
+                    )
+                    return
+
     def _postinstall(self) -> None:
         with in_cwd(self.target):
             assert self.postinstall_cmd is not None
@@ -212,6 +230,8 @@ class Repo:
             return
         if self.symlink_to is not None:
             self._symlink()
+        if len(self.preinstall_cmd) > 0:
+            self._preinstall()
         if self.pip_install:
             self._pip_install()
         if self.editable_install:
