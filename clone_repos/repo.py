@@ -79,6 +79,10 @@ class Repo:
             f"While trying to parse list, string or null, found {type(val)} {val}"
         )
 
+    known_keys = set(
+        ["dirname", "pip", "preinstall", "postinstall", "symlink_to", "base"]
+    )
+
     @classmethod
     def from_dict(
         cls, git_url: str, base: Path, data: Optional[Dict[str, Any]] = None
@@ -103,6 +107,14 @@ class Repo:
         if "base" in data and isinstance(data["base"], str):
             base = Path(data["base"]).expanduser().absolute()
             assert base.exists(), f"provided base '{base}' does not exist"
+        log_name = None
+        for key in data.keys():
+            if key not in cls.known_keys:
+                if log_name is None:
+                    log_name = cls._parse_name_from_url(git_url)
+                click.echo(
+                    f"{log_name}: Warning, unknown key: '{key}' '{data[key]}'", err=True
+                )
         return cls(
             base=base,
             git_url=git_url,
@@ -120,10 +132,14 @@ class Repo:
 
     __str__ = __repr__
 
+    @staticmethod
+    def _parse_name_from_url(url: str) -> str:
+        return urlparse(url).path.split("/")[-1]
+
     @cached_property
     def name(self) -> str:
         if self.dirname is None:
-            return urlparse(self.git_url).path.split("/")[-1]
+            return self.__class__._parse_name_from_url(self.git_url)
         else:
             return self.dirname
 
