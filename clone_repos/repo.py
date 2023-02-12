@@ -90,6 +90,11 @@ class Repo:
             assert v is not None
             return [v]
         elif isinstance(val, list):
+            for item in val:
+                if not isinstance(item, str):
+                    raise RuntimeError(
+                        f"While trying to parse list of strings {val}, found non-string: {item}"
+                    )
             return val
         raise RuntimeError(
             f"While trying to parse list, string or null, found {type(val)} {val}"
