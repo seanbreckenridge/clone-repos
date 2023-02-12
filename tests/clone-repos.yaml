@@ -10,6 +10,7 @@
   dirname: bl-fork
   symlink_to: "/tmp"
   pip: editable
+  pipefail: false
   postinstall:
     - 'git remote add upstream "https://github.com/karlicoss/bleanser"'
     - "git pull upstream master"

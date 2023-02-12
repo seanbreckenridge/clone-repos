@@ -1,0 +1,5 @@
+"https://github.com/seanbreckenridge/ttally":
+  preinstall:
+    - "false"
+    - "echo this shouldnt run"
+  pipefail: true

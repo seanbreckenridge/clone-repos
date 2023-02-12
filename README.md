@@ -28,11 +28,11 @@ Usage: clone-repos [OPTIONS] CONFIG_FILE
   Can provide a CONFIG_FILE instead of using the default
 
 Options:
-  --base-repos DIRECTORY  base repository directory to clone repos into
-                          [required]
-  --parse-config          test parsing the config file instead of running
-                          clone
-  --help                  Show this message and exit.
+  -b, --base-repos DIRECTORY  base repository directory to clone repos into
+                              [env var: REPOS; required]
+  -P, --parse-config          test parsing the config file instead of running
+                              clone
+  --help                      Show this message and exit.
 ```
 
 The full format for a repo is:
@@ -47,6 +47,7 @@ The full format for a repo is:
     - "shell command 1"
     - "shell command 2"
   postinstall: "shell command here"
+  pipefail: false # if true, stops multiple preinstall/postinstall if any command fails
 ```
 
 The `preinstall` and `postinstall` scripts can either be one command (a string), or multiple (a list)

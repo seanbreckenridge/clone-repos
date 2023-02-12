@@ -20,13 +20,16 @@ def _default(val: Any) -> Any:
 
 @click.command()
 @click.option(
+    "-b",
     "--base-repos",
     required=True,
     type=click.Path(file_okay=False, dir_okay=True, exists=True, path_type=Path),
     envvar="REPOS",
-    help="base repository directory to clone repos into ($REPOS envvar)",
+    show_envvar=True,
+    help="base repository directory to clone repos into",
 )
 @click.option(
+    "-P",
     "--parse-config",
     required=False,
     is_flag=True,

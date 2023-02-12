@@ -8,6 +8,8 @@ this_dir = Path(__file__).parent
 conf = this_dir / "clone-repos.yaml"
 assert conf.exists()
 
+pipefail = this_dir / "pipefail.yaml"
+
 base = Path(os.environ["REPOS"])
 
 
@@ -31,3 +33,10 @@ def test_parse_config() -> None:
     assert repos[0].git_url == "https://github.com/seanbreckenridge/ttally"
     assert repos[0].preinstall_cmd == ["git pull"]
     assert repos[2].preinstall_cmd == ["git pull"]
+    assert repos[2].pipefail == False
+
+
+def test_pipefail() -> None:
+    repos = Repo.parse_file(base=base, file=pipefail)
+    assert isinstance(repos, list)
+    assert repos[0].pipefail == True

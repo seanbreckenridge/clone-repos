@@ -1,3 +1,4 @@
+from __future__ import annotations
 import sys
 import os
 import shlex
@@ -45,6 +46,7 @@ class Repo:
         pip_install: bool = False,
         editable_install: bool = False,
         editable_non_user: bool = False,
+        pipefail: bool = False,
     ) -> None:
         self.base = base
         self.git_url = git_url
@@ -56,6 +58,20 @@ class Repo:
         self.editable_check_dirs = ["src"]
         self.dirname = dirname
         self.symlink_to = symlink_to
+        self.pipefail = pipefail
+
+    @staticmethod
+    def strip_bool(val: Union[bool, str, None], default: bool) -> bool:
+        if val is None:
+            return default
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            if val.lower() == "true":
+                return True
+            elif val.lower() == "false":
+                return False
+        raise RuntimeError(f"Could not parse bool: {val}")
 
     @staticmethod
     def strip_str(val: Optional[str]) -> Optional[str]:
@@ -80,13 +96,21 @@ class Repo:
         )
 
     known_keys = set(
-        ["dirname", "pip", "preinstall", "postinstall", "symlink_to", "base"]
+        [
+            "dirname",
+            "pip",
+            "preinstall",
+            "postinstall",
+            "symlink_to",
+            "base",
+            "pipefail",
+        ]
     )
 
     @classmethod
     def from_dict(
         cls, git_url: str, base: Path, data: Optional[Dict[str, Any]] = None
-    ) -> "Repo":
+    ) -> Repo:
         if data is None:
             data = {}
         dirname = cls.strip_str(data.get("dirname"))
@@ -104,6 +128,7 @@ class Repo:
         preinstall = cls.strip_lst(data.get("preinstall"))
         postinstall = cls.strip_lst(data.get("postinstall"))
         symlink_to = cls.strip_str(data.get("symlink_to"))
+        pipefail = cls.strip_bool(data.get("pipefail"), default=False)
         if "base" in data and isinstance(data["base"], str):
             base = Path(data["base"]).expanduser().absolute()
             assert base.exists(), f"provided base '{base}' does not exist"
@@ -125,6 +150,7 @@ class Repo:
             pip_install=pip_install,
             editable_install=editable_install,
             editable_non_user=editable_non_user,
+            pipefail=pipefail,
         )
 
     def __repr__(self) -> str:
@@ -189,9 +215,7 @@ class Repo:
         )
         proc.wait()
         if proc.returncode != 0:
-            click.echo(
-                f"{self.name}: pip error, return code {proc.returncode}", err=True
-            )
+            raise RuntimeError(f"{self.name}: pip error, return code {proc.returncode}")
 
     def _editable_install(self) -> None:
         e = Editable()
@@ -208,8 +232,8 @@ class Repo:
             proc = subprocess.Popen(shlex.split(cmd))
             proc.wait()
             if proc.returncode != 0:
-                click.echo(
-                    f"{self.name}: pip error, return code {proc.returncode}", err=True
+                raise RuntimeError(
+                    f"{self.name}: pip error, return code {proc.returncode}"
                 )
 
     def _preinstall(self) -> None:
@@ -224,7 +248,11 @@ class Repo:
                         f"{self.name}: preinstall error, return code {proc.returncode}",
                         err=True,
                     )
-                    return
+                    if self.pipefail:
+                        click.echo(
+                            f"{self.name}: pipefail is set, aborting install",
+                        )
+                        return
 
     def _postinstall(self) -> None:
         with in_cwd(self.target):
@@ -238,7 +266,11 @@ class Repo:
                         f"{self.name}: postinstall error, return code {proc.returncode}",
                         err=True,
                     )
-                    return
+                    if self.pipefail:
+                        click.echo(
+                            f"{self.name}: pipefail is set, aborting install",
+                        )
+                        return
 
     def run(self) -> None:
         err = self._git_clone()
