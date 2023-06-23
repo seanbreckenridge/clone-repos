@@ -39,6 +39,7 @@ class Repo:
         base: Path,
         git_url: str,
         *,
+        break_system_packages: bool = False,
         symlink_to: Optional[str] = None,
         dirname: Optional[str] = None,
         preinstall_cmd: Optional[List[str]] = None,
@@ -59,6 +60,7 @@ class Repo:
         self.dirname = dirname
         self.symlink_to = symlink_to
         self.pipefail = pipefail
+        self.break_system_packages = break_system_packages
 
     @staticmethod
     def strip_bool(val: Union[bool, str, None], default: bool) -> bool:
@@ -114,7 +116,11 @@ class Repo:
 
     @classmethod
     def from_dict(
-        cls, git_url: str, base: Path, data: Optional[Dict[str, Any]] = None
+        cls,
+        git_url: str,
+        base: Path,
+        break_system_packages: bool,
+        data: Optional[Dict[str, Any]] = None,
     ) -> Repo:
         if data is None:
             data = {}
@@ -149,6 +155,7 @@ class Repo:
             base=base,
             git_url=git_url,
             dirname=dirname,
+            break_system_packages=break_system_packages,
             preinstall_cmd=preinstall,
             postinstall_cmd=postinstall,
             symlink_to=symlink_to,
@@ -215,9 +222,9 @@ class Repo:
         os.symlink(self.target, link_target)
 
     def _pip_install(self) -> None:
-        proc = subprocess.Popen(
-            [sys.executable, *shlex.split(f"-m pip install --user '{self.target}'")]
-        )
+        cmd = f"{sys.executable} -m pip install --user {'--break-system-packages' if self.break_system_packages else ''} '{self.target}'"
+        click.echo(f"{self.name}: running '{cmd}'")
+        proc = subprocess.Popen(shlex.split(cmd))
         proc.wait()
         if proc.returncode != 0:
             raise RuntimeError(f"{self.name}: pip error, return code {proc.returncode}")
@@ -232,8 +239,8 @@ class Repo:
         if any(t in installed for t in targets):
             click.echo(f"{self.name}: {self.target} already in editable install list")
         else:
-            cmd = f"{sys.executable} -m pip install {'--user' if not self.editable_non_user else ''} --editable '{self.target}'"
-            click.echo(f"{self.name}: Running '{cmd}'")
+            cmd = f"""{sys.executable} -m pip install {'--user' if not self.editable_non_user else ''} --editable {'--break-system-packages' if self.break_system_packages else ''} '{self.target}'"""
+            click.echo(f"{self.name}: running '{cmd}'")
             proc = subprocess.Popen(shlex.split(cmd))
             proc.wait()
             if proc.returncode != 0:
@@ -293,10 +300,22 @@ class Repo:
             self._postinstall()
 
     @classmethod
-    def parse_file(cls, base: Path, file: Path) -> List["Repo"]:
+    def parse_file(
+        cls,
+        base: Path,
+        file: Path,
+        break_system_packages: bool = False,
+    ) -> List["Repo"]:
         repos: List[Repo] = []
         with file.open("r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         for key, data in data.items():
-            repos.append(Repo.from_dict(git_url=key, base=base, data=data))
+            repos.append(
+                Repo.from_dict(
+                    git_url=key,
+                    base=base,
+                    break_system_packages=break_system_packages,
+                    data=data,
+                )
+            )
         return repos

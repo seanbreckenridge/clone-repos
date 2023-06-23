@@ -28,11 +28,12 @@ Usage: clone-repos [OPTIONS] CONFIG_FILE
   Can provide a CONFIG_FILE instead of using the default
 
 Options:
-  -b, --base-repos DIRECTORY  base repository directory to clone repos into
-                              [env var: REPOS; required]
-  -P, --parse-config          test parsing the config file instead of running
-                              clone
-  --help                      Show this message and exit.
+  -b, --base-repos DIRECTORY   base repository directory to clone repos into
+                               [env var: REPOS; required]
+  -P, --parse-config           test parsing the config file instead of running
+                               clone
+  -B, --break-system-packages  pass the --break-system-packages flag to pip
+  --help                       Show this message and exit.
 ```
 
 The full format for a repo is:
@@ -66,7 +67,7 @@ To clone, run `clone-repos` or `python3 -m clone_repos`
 
 To run this quickly on new machines, I setup an alias in my dotfiles like:
 
-`alias cr="python3 -m pip install 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos"`
+`alias cr="python3 -m pip install --break-system-packages 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos -B"`
 
 ### Tests
 

@@ -35,19 +35,30 @@ def _default(val: Any) -> Any:
     is_flag=True,
     help="test parsing the config file instead of running clone",
 )
+@click.option(
+    "-B",
+    "--break-system-packages",
+    required=False,
+    is_flag=True,
+    help="pass the --break-system-packages flag to pip",
+)
 @click.argument(
     "CONFIG_FILE",
     required=True,
     type=click.Path(dir_okay=False, file_okay=True, exists=True, path_type=Path),
     default=default_config,
 )
-def main(base_repos: Path, parse_config: bool, config_file: Path) -> None:
+def main(
+    base_repos: Path, parse_config: bool, break_system_packages: bool, config_file: Path
+) -> None:
     """
     Clones and sets up your repos.
 
     Can provide a CONFIG_FILE instead of using the default
     """
-    repos = Repo.parse_file(base=base_repos, file=config_file)
+    repos = Repo.parse_file(
+        base=base_repos, file=config_file, break_system_packages=break_system_packages
+    )
     if parse_config:
         for r in repos:
             print(json.dumps(r.__dict__, default=_default))
