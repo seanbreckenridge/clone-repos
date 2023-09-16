@@ -219,7 +219,12 @@ class Repo:
             click.echo(f"{self.name}: link target {link_target} is already linked")
             return
         click.echo(f"Symlinking {self.target} -> {link_target}")
-        os.symlink(self.target, link_target)
+        try:
+            os.symlink(self.target, link_target)
+        except FileExistsError:
+            click.echo(
+                f"{self.name}: symlink target {link_target} already exists, skipping symlink"
+            )
 
     def _pip_install(self) -> None:
         cmd = f"{sys.executable} -m pip install --user {'--break-system-packages' if self.break_system_packages else ''} '{self.target}'"
