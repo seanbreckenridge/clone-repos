@@ -18,7 +18,9 @@ def _default(val: Any) -> Any:
     raise TypeError(f"Not sure how to serialize {type(val)} {val}")
 
 
-@click.command(epilog="See https://github.com/seanbreckenridge/clone-repos/ for config file format")
+@click.command(
+    epilog="See https://github.com/seanbreckenridge/clone-repos/ for config file format"
+)
 @click.option(
     "-b",
     "--base-repos",
