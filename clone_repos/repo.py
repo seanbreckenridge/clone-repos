@@ -215,7 +215,7 @@ class Repo:
             click.echo(f"{self.name}: target directory {st} does not exist")
             return
         link_target = st / self.name
-        if os.path.islink(link_target):
+        if os.path.exists(link_target):
             click.echo(f"{self.name}: link target {link_target} is already linked")
             return
         click.echo(f"Symlinking {self.target} -> {link_target}")
