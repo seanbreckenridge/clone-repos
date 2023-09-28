@@ -16,7 +16,7 @@ Requires `python3.9+`
 
 To install with pip, run:
 
-    pip install git+https://github.com/seanbreckenridge/clone-repos
+    pip install cl-repos
 
 ## Usage
 
