@@ -142,7 +142,12 @@ class Repo:
         pipefail = cls.strip_bool(data.get("pipefail"), default=False)
         if "base" in data and isinstance(data["base"], str):
             base = Path(data["base"]).expanduser().absolute()
-            assert base.exists(), f"provided base '{base}' does not exist"
+            if not base.exists():
+                click.echo(
+                    f"Warning: base directory '{base}' does not exist, creating it",
+                    err=True,
+                )
+                base.mkdir(parents=True)
         log_name = None
         for key in data.keys():
             if key not in cls.known_keys:
