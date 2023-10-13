@@ -4,11 +4,16 @@ a basic git repo clone script, with special support for pip and/or editable inst
 
 This supports running a preinstall (after cloning) or postinstall step (a shell command) as well
 
-For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see
+For examples of a `clone-repos.yaml` file this expects at `~/.config/clone-repos.yaml`, see:
 
-- [clone-repos.yaml](https://sean.fish/d/clone-repos.yaml?redirect)
-- [computer-clone-repos.yaml](https://sean.fish/d/computer-clone-repos.yaml?redirect)
-- [hpi-clone-repos.yaml](https://sean.fish/d/hpi-clone-repos.yaml?redirect)
+- [clone-repos](https://sean.fish/d/clone-repos.yaml?redirect)
+- [computer-clone-repos](https://sean.fish/d/computer-clone-repos.yaml?redirect)
+- [hpi-clone-repos](https://sean.fish/d/hpi-clone-repos.yaml?redirect)
+
+I also use this to install plugins/addons for things like [ranger](https://ranger.github.io/) or [todotxt](https://github.com/todotxt/todo.txt-cli):
+
+- [ranger-plugins](https://sean.fish/d/ranger-plugins.yaml?redirect)
+- [todotxt-actions](https://sean.fish/d/todotxt-actions.yaml?redirect)
 
 ## Installation
 
