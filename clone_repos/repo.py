@@ -262,8 +262,8 @@ class Repo:
         with in_cwd(self.target):
             assert self.preinstall_cmd is not None
             for cmd in self.preinstall_cmd:
-                click.echo(f"{self.name}: running preinstall '{cmd}'")
-                proc = subprocess.Popen(shlex.split(cmd))
+                click.echo(f"{self.name}: running preinstall sh -c '{cmd}'")
+                proc = subprocess.Popen(["sh", "-c", cmd])
                 proc.wait()
                 if proc.returncode != 0:
                     click.echo(
@@ -280,8 +280,8 @@ class Repo:
         with in_cwd(self.target):
             assert self.postinstall_cmd is not None
             for cmd in self.postinstall_cmd:
-                click.echo(f"{self.name}: running postinstall '{cmd}'")
-                proc = subprocess.Popen(shlex.split(cmd))
+                click.echo(f"{self.name}: running postinstall sh -c '{cmd}'")
+                proc = subprocess.Popen(["sh", "-c", cmd])
                 proc.wait()
                 if proc.returncode != 0:
                     click.echo(
