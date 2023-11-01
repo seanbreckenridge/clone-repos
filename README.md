@@ -72,7 +72,7 @@ To clone, run `clone-repos` or `python3 -m clone_repos`
 
 To run this quickly on new machines, I setup an alias in my dotfiles like:
 
-`alias cr="python3 -m pip install --break-system-packages 'git+https://github.com/seanbreckenridge/clone-repos' && clone-repos -B"`
+`alias cr="pip install cl-repos && clone-repos -B"`
 
 ### Tests
 
